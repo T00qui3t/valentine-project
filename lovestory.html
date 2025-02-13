@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Puzzle 💖</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ffe4e1;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #d63384;
+        }
+        .puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .puzzle-piece {
+            width: 100px;
+            height: 100px;
+            background-size: 300px 300px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+        }
+        .puzzle-piece:hover {
+            transform: scale(1.1);
+        }
+        .hidden-message {
+            display: none;
+            margin-top: 20px;
+            font-size: 22px;
+            color: #d63384;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .win-animation {
+            animation: popUp 1s ease-in-out forwards;
+        }
+        @keyframes popUp {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <h1>💖 Put Together Our Picture 💖</h1>
+    <p>Drag and arrange the pieces to complete the picture!</p>
+    <div class="puzzle-container" id="puzzleContainer"></div>
+    <div class="hidden-message" id="hiddenMessage"> Congrats! I love you Dave💕</div>
+    
+    <script>
+        const puzzleContainer = document.getElementById("puzzleContainer");
+        const hiddenMessage = document.getElementById("hiddenMessage");
+        let positions = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        let shuffled = positions.sort(() => Math.random() - 0.5);
+        let correctOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        
+        shuffled.forEach((pos, index) => {
+            let piece = document.createElement("div");
+            piece.classList.add("puzzle-piece");
+            piece.style.backgroundImage = "url('image/cute.JPG')";
+            piece.style.backgroundPosition = `${-(pos % 3) * 100}px ${-Math.floor(pos / 3) * 100}px`;
+            piece.setAttribute("data-index", pos);
+            piece.draggable = true;
+            
+            piece.addEventListener("dragstart", dragStart);
+            piece.addEventListener("dragover", dragOver);
+            piece.addEventListener("drop", drop);
+            
+            puzzleContainer.appendChild(piece);
+        });
+        
+        function dragStart(event) {
+            event.dataTransfer.setData("text", event.target.dataset.index);
+        }
+        
+        function dragOver(event) {
+            event.preventDefault();
+        }
+        
+        function drop(event) {
+            event.preventDefault();
+            let draggedIndex = event.dataTransfer.getData("text");
+            let targetIndex = event.target.dataset.index;
+            
+            let draggedElement = document.querySelector(`[data-index='${draggedIndex}']`);
+            let targetElement = document.querySelector(`[data-index='${targetIndex}']`);
+            
+            let tempPos = draggedElement.style.backgroundPosition;
+            draggedElement.style.backgroundPosition = targetElement.style.backgroundPosition;
+            targetElement.style.backgroundPosition = tempPos;
+            
+            let tempIndex = draggedElement.dataset.index;
+            draggedElement.dataset.index = targetElement.dataset.index;
+            targetElement.dataset.index = tempIndex;
+            
+            checkCompletion();
+        }
+        
+        function checkCompletion() {
+            let pieces = document.querySelectorAll(".puzzle-piece");
+            let isComplete = Array.from(pieces).every((piece, i) => parseInt(piece.dataset.index) === correctOrder[i]);
+            
+            if (isComplete) {
+                hiddenMessage.style.display = "block";
+                hiddenMessage.classList.add("win-animation");
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
